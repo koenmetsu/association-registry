@@ -25,7 +25,6 @@ metadata:
 spec:
   type: other
   lifecycle: unknown
-  owner: koenmetsu
   owner: orca
   system: association-registry
   subcomponentOf: component:association-registry
