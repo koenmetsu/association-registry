@@ -9,16 +9,3 @@ spec:
   lifecycle: unknown
   owner: orca
   system: association-registry
----
-apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: orca
-  description: Orca
-spec:
-  type: business-unit
-  profile:
-    displayName: Infrastructure
-    email: infrastructure@example.com
-    picture: https://example.com/groups/bu-infrastructure.jpeg
-  members: [koenmetsu]
