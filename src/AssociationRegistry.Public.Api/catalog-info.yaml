@@ -3,6 +3,11 @@ kind: API
 metadata:
   name: public-api
   description: Public API
+  links:
+    - url: https://publiek.verenigingen
+      title: Publieke Api
+      icon: dashboard
+
 spec:
   type: openapi
   lifecycle: production
@@ -11,8 +16,4 @@ spec:
   subcomponentOf: component:association-registry
   definition: 
     $text: https://publiek.verenigingen.test-vlaanderen.be/docs/v1/docs.json
-  links:
-    - url: https://publiek.verenigingen
-      title: Publieke Api
-      icon: dashboard
 
