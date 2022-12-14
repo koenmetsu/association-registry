@@ -15,8 +15,7 @@ spec:
   subcomponentOf: component:association-registry
   definition: 
     $text: https://publiek.verenigingen.test-vlaanderen.be/docs/v1/docs.json
-  providesApis: 
-    - api:association-registry-public-api
+
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -30,3 +29,5 @@ spec:
   owner: orca
   system: association-registry
   subcomponentOf: component:association-registry
+  providesApis: 
+    - api:public-api
