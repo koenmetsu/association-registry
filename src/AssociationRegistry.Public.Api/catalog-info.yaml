@@ -10,4 +10,4 @@ spec:
   system: association-registry
   subcomponentOf: association-registry
   definition: 
-    $text: https://publiek.verenigingen.test-vlaanderen.be/docs/v1/docs.json?culture=en-GB
+    $text: https://publiek.verenigingen.test-vlaanderen.be/docs/v1/docs.json
