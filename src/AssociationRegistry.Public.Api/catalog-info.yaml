@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: public-api
+  description: Public API
+spec:
+  type: openapi
+  lifecycle: production
+  owner: orca
+  system: association-registry
+  subcomponentOf: association-registry
