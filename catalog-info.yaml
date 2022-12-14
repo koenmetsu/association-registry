@@ -4,6 +4,7 @@ metadata:
   name: association-registry
   annotations:
     github.com/project-slug: koenmetsu/association-registry
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: other
   lifecycle: unknown
