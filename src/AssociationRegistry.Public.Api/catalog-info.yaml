@@ -7,7 +7,6 @@ metadata:
     - url: https://publiek.verenigingen
       title: Publieke Api
       icon: dashboard
-
 spec:
   type: openapi
   lifecycle: production
@@ -16,4 +15,15 @@ spec:
   subcomponentOf: component:association-registry
   definition: 
     $text: https://publiek.verenigingen.test-vlaanderen.be/docs/v1/docs.json
-
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: association-registry-public-api
+  annotations:
+    github.com/project-slug: koenmetsu/association-registry
+spec:
+  type: other
+  lifecycle: unknown
+  owner: koenmetsu
+  subcomponentOf: component:association-registry
