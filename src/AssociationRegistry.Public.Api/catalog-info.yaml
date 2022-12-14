@@ -15,6 +15,7 @@ spec:
   subcomponentOf: component:association-registry
   definition: 
     $text: https://publiek.verenigingen.test-vlaanderen.be/docs/v1/docs.json
+  providesApi: api:association-registry-public-api
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
