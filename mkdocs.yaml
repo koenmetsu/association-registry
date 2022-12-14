@@ -1,0 +1,7 @@
+site_name: 'example-docs'
+
+nav:
+  - Home: readme.md
+
+plugins:
+  - techdocs-core
