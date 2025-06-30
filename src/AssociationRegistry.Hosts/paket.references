@@ -1,5 +1,6 @@
 NEST
 Npgsql
+Marten
 Serilog
 Microsoft.Extensions.Configuration
 Microsoft.Extensions.Configuration.Binder

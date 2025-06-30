@@ -2,6 +2,7 @@
 
 using Constants;
 using Json;
+using AssociationRegistry.Hosts.Marten;
 using Marten;
 using Marten.Events;
 using Marten.Services;
@@ -18,7 +19,7 @@ public static class MartenExtensions
     {
         services.AddMarten(_ =>
         {
-            var connectionString1 = GetPostgresConnectionString(postgreSqlOptions);
+            var connectionString1 = CommonMartenConfigurator.BuildConnectionString(postgreSqlOptions);
 
             var opts = new StoreOptions();
 
@@ -34,7 +35,9 @@ public static class MartenExtensions
 
             opts.Events.MetadataConfig.EnableAll();
 
-            opts.Serializer(CreateCustomMartenSerializer());
+            opts.Serializer(CommonMartenConfigurator.CreateSerializer(
+                new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly),
+                new DateOnlyJsonConvertor(WellknownFormats.DateOnly)));
 
             return opts;
         }).UseLightweightSessions();
@@ -42,23 +45,5 @@ public static class MartenExtensions
         return services;
     }
 
-    private static string GetPostgresConnectionString(PostgreSqlOptionsSection postgreSqlOptions)
-        => $"host={postgreSqlOptions.Host};" +
-           $"database={postgreSqlOptions.Database};" +
-           $"password={postgreSqlOptions.Password};" +
-           $"username={postgreSqlOptions.Username}";
 
-    public static JsonNetSerializer CreateCustomMartenSerializer()
-    {
-        var jsonNetSerializer = new JsonNetSerializer();
-
-        jsonNetSerializer.Customize(
-            s =>
-            {
-                s.Converters.Add(new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly));
-                s.Converters.Add(new DateOnlyJsonConvertor(WellknownFormats.DateOnly));
-            });
-
-        return jsonNetSerializer;
-    }
 }

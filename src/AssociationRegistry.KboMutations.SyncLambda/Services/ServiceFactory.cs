@@ -18,6 +18,7 @@ using Marten.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using AssociationRegistry.Hosts.Marten;
 using Npgsql;
 using Telemetry;
 using Weasel.Core;
@@ -151,7 +152,9 @@ public class ServiceFactory
         opts.Schema.For<MagdaCallReference>().Identity(x => x.Reference);
         opts.Connection(connectionString);
         opts.Events.StreamIdentity = StreamIdentity.AsString;
-        opts.Serializer(CreateCustomMartenSerializer());
+        opts.Serializer(CommonMartenConfigurator.CreateSerializer(
+            new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly),
+            new DateOnlyJsonConvertor(WellknownFormats.DateOnly)));
         opts.Events.MetadataConfig.EnableAll();
         opts.AutoCreateSchemaObjects = AutoCreate.None;
 
@@ -165,19 +168,6 @@ public class ServiceFactory
         return opts;
     }
 
-    private static JsonNetSerializer CreateCustomMartenSerializer()
-    {
-        var jsonNetSerializer = new JsonNetSerializer();
-
-        jsonNetSerializer.Customize(s =>
-        {
-            s.DateParseHandling = DateParseHandling.None;
-            s.Converters.Add(new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly));
-            s.Converters.Add(new DateOnlyJsonConvertor(WellknownFormats.DateOnly));
-        });
-
-        return jsonNetSerializer;
-    }
 
     private static VerenigingsRepository CreateRepository(DocumentStore store, ILoggerFactory loggerFactory)
     {

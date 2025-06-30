@@ -9,6 +9,7 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Marten.Services;
 using Newtonsoft.Json;
+using AssociationRegistry.Hosts.Marten;
 using Projections;
 using Projections.Detail;
 using Projections.Search;
@@ -52,30 +53,14 @@ public static class ConfigureMartenExtensions
         bool isDevelopment
     )
     {
-        static string GetPostgresConnectionString(PostgreSqlOptionsSection? postgreSqlOptions)
-            => $"host={postgreSqlOptions.Host};" +
-               $"database={postgreSqlOptions.Database};" +
-               $"password={postgreSqlOptions.Password};" +
-               $"username={postgreSqlOptions.Username}";
-
-        static JsonNetSerializer CreateCustomMartenSerializer()
-        {
-            var jsonNetSerializer = new JsonNetSerializer();
-
-            jsonNetSerializer.Customize(
-                s =>
-                {
-                    s.DateParseHandling = DateParseHandling.None;
-                    s.Converters.Add(new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly));
-                    s.Converters.Add(new DateOnlyJsonConvertor(WellknownFormats.DateOnly));
-                });
-
-            return jsonNetSerializer;
-        }
+        static JsonNetSerializer CreateSerializer() =>
+            CommonMartenConfigurator.CreateSerializer(
+                new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly),
+                new DateOnlyJsonConvertor(WellknownFormats.DateOnly));
 
         var postgreSqlOptions = postgreSqlOptionsSection;
 
-        var connectionString = GetPostgresConnectionString(postgreSqlOptions);
+        var connectionString = CommonMartenConfigurator.BuildConnectionString(postgreSqlOptions);
 
         opts.Connection(connectionString);
 
@@ -106,7 +91,7 @@ public static class ConfigureMartenExtensions
             ProjectionLifecycle.Async,
             ProjectionNames.PubliekZoek);
 
-        opts.Serializer(CreateCustomMartenSerializer());
+        opts.Serializer(CreateSerializer());
 
         opts.RegisterDocumentType<PubliekVerenigingDetailDocument>();
         opts.RegisterDocumentType<PubliekVerenigingSequenceDocument>();

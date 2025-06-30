@@ -4,6 +4,7 @@ using Constants;
 using Hosts.Configuration.ConfigurationBindings;
 using JasperFx.CodeGeneration;
 using Json;
+using AssociationRegistry.Hosts.Marten;
 using Marten;
 using Marten.Events;
 using Marten.Events.Daemon.Resiliency;
@@ -41,7 +42,7 @@ public static class MartenExtensions
 
     public static void ConfigureStoreOptions(StoreOptions opts, PostgreSqlOptionsSection postgreSqlOptions, bool isDevelopment)
     {
-        opts.Connection(postgreSqlOptions.GetConnectionString());
+        opts.Connection(CommonMartenConfigurator.BuildConnectionString(postgreSqlOptions));
 
         if (!postgreSqlOptions.Schema.IsNullOrEmpty())
         {
@@ -50,7 +51,9 @@ public static class MartenExtensions
         }
 
         opts.Events.StreamIdentity = StreamIdentity.AsString;
-        opts.Serializer(CreateCustomMartenSerializer());
+        opts.Serializer(CommonMartenConfigurator.CreateSerializer(
+            new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly),
+            new DateOnlyJsonConvertor(WellknownFormats.DateOnly)));
         opts.Events.MetadataConfig.EnableAll();
         opts.AddPostgresProjections();
 
@@ -70,24 +73,5 @@ public static class MartenExtensions
         }
     }
 
-    public static string GetConnectionString(this PostgreSqlOptionsSection postgreSqlOptions)
-        => $"host={postgreSqlOptions.Host};" +
-           $"database={postgreSqlOptions.Database};" +
-           $"password={postgreSqlOptions.Password};" +
-           $"username={postgreSqlOptions.Username}";
 
-    public static JsonNetSerializer CreateCustomMartenSerializer()
-    {
-        var jsonNetSerializer = new JsonNetSerializer();
-
-        jsonNetSerializer.Customize(
-            s =>
-            {
-                s.DateParseHandling = DateParseHandling.None;
-                s.Converters.Add(new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly));
-                s.Converters.Add(new DateOnlyJsonConvertor(WellknownFormats.DateOnly));
-            });
-
-        return jsonNetSerializer;
-    }
 }
