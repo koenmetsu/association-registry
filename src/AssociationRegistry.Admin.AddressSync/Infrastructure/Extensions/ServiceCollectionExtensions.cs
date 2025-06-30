@@ -8,6 +8,7 @@ using Marten.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using AssociationRegistry.Hosts.Marten;
 using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
@@ -77,8 +78,8 @@ public static class ServiceCollectionExtensions
                                                serviceProvider =>
                                                {
                                                    var opts = new StoreOptions();
-                                                   opts.Connection(postgreSqlOptions.GetConnectionString());
-                                                   opts.Serializer(CreateMartenSerializer());
+                                                   opts.Connection(CommonMartenConfigurator.BuildConnectionString(postgreSqlOptions));
+                                                   opts.Serializer(CommonMartenConfigurator.CreateSerializer());
                                                    opts.Events.StreamIdentity = StreamIdentity.AsString;
 
                                                    opts.Events.MetadataConfig.EnableAll();
@@ -108,19 +109,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static JsonNetSerializer CreateMartenSerializer()
-    {
-        var jsonNetSerializer = new JsonNetSerializer();
-
-        jsonNetSerializer.Customize(
-            s =>
-            {
-                s.DateParseHandling = DateParseHandling.None;
-            });
-
-        return jsonNetSerializer;
-    }
-
+    
     public static string CollectorUrl
         => Environment.GetEnvironmentVariable("COLLECTOR_URL") ?? "http://localhost:4317";
 

@@ -6,6 +6,7 @@ using GrarConsumer.Kafka;
 using Hosts.Configuration.ConfigurationBindings;
 using JasperFx.CodeGeneration;
 using Json;
+using AssociationRegistry.Hosts.Marten;
 using Magda.Models;
 using Marten;
 using Marten.Events;
@@ -46,9 +47,11 @@ public static class MartenExtensions
                                           opts.OpenTelemetry.TrackConnections = TrackLevel.Normal;
                                           opts.OpenTelemetry.TrackEventCounters();
 
-                                          opts.Connection(postgreSqlOptions.GetConnectionString());
+                                          opts.Connection(CommonMartenConfigurator.BuildConnectionString(postgreSqlOptions));
                                           opts.Storage.Add(new VCodeSequence(opts, VCode.StartingVCode));
-                                          opts.Serializer(CreateCustomMartenSerializer());
+                                          opts.Serializer(CommonMartenConfigurator.CreateSerializer(
+                                              new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly),
+                                              new DateOnlyJsonConvertor(WellknownFormats.DateOnly)));
 
                                           opts.Events.StreamIdentity = StreamIdentity.AsString;
                                           opts.Events.MetadataConfig.EnableAll();
@@ -111,24 +114,4 @@ public static class MartenExtensions
         return services;
     }
 
-    public static string GetConnectionString(this PostgreSqlOptionsSection postgreSqlOptions)
-        => $"host={postgreSqlOptions.Host};" +
-           $"database={postgreSqlOptions.Database};" +
-           $"password={postgreSqlOptions.Password};" +
-           $"username={postgreSqlOptions.Username};";
-
-    public static JsonNetSerializer CreateCustomMartenSerializer()
-    {
-        var jsonNetSerializer = new JsonNetSerializer();
-
-        jsonNetSerializer.Customize(
-            s =>
-            {
-                s.DateParseHandling = DateParseHandling.None;
-                s.Converters.Add(new NullableDateOnlyJsonConvertor(WellknownFormats.DateOnly));
-                s.Converters.Add(new DateOnlyJsonConvertor(WellknownFormats.DateOnly));
-            });
-
-        return jsonNetSerializer;
-    }
 }
